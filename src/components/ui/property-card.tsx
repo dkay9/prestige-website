@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { toggleFavorite, isFavorite } from "@/lib/favorites";
+import { useFavorites } from "@/lib/favorites-context";
 import type { Property } from "@/types";
 
 function HeartIcon({ filled }: { filled: boolean }) {
@@ -30,17 +30,13 @@ interface PropertyCardProps {
 export default function PropertyCard({ property, index = 0 }: PropertyCardProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-40px" });
-  const [liked, setLiked] = useState(false);
+  const { has, toggle } = useFavorites();
+  const liked = has(property.id);
 
-  useEffect(() => {
-    setLiked(isFavorite(property.id));
-  }, [property.id]);
-
-  const handleLike = (e: React.MouseEvent) => {
+   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(property.id);
-    setLiked((prev) => !prev);
+    toggle(property.id);
   };
 
   return (
